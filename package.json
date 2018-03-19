@@ -8,11 +8,9 @@
     "npm": "1.2.x"
   },
   "dependencies": {
-    "restify": "^4.3.2",
+    "restify": "^6.3.4",
     "config-multipaas": "0.2.2",
-    "mongojs": "^2.5.0",
-    "pg": "^4.4.5",
-    "pg-query": "^0.11.0"
+    "mongojs": "^2.5.0"
   },
   "devDependencies": {},
   "repository": {

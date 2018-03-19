@@ -11,10 +11,20 @@ var autoconfig  = function (config_overrides){
     db_svc_name: process.env.DATABASE_SERVICE_NAME || process.env.DB_HOST || "mongodb"
   })
 
+  var ws_info = {
+    id: "nationalparks-js",
+    displayName: "National Parks (JS)",
+    type: "cluster",
+    center: {'latitude': '47.039304', 'longitude': '14.505178'},
+    zoom: 4
+  };
+
   var db_config = config.get('db_svc_name')+'://'+config.get('username')+":"+config.get('password')+"@"+config.get('db_host')+":"+config.get('db_port')+"/";
       table     = config.get('table_name');
 
   config.add({db_config: db_config+table});
+  config.add({wsinfo: JSON.stringify(ws_info)});
   return config;
 }
+
 exports = module.exports = autoconfig();

@@ -11,4 +11,11 @@ if( db_svc == "postgresql"){
   console.log("ERROR: DB Configuration missing! Failed to autoconfigure database");
 }
 
+db_export.wsinfo = function (req, res, next)
+{
+  res.status(200);
+  res.header('Content-Type', 'application/json');
+  res.end(config.get('wsinfo'));
+};
+
 module.exports = exports = db_export;
