@@ -2,7 +2,7 @@ var restify = require('restify'),
     fs      = require('fs'),
     config  = require('./bin/config.js'),
     db      = require('./bin/db.js');
-var app     = restify.createServer({strictRouting: false});
+var app     = restify.createServer();
 
 //db.initDB('keepAlive');
 app.use(restify.plugins.queryParser())
@@ -12,6 +12,7 @@ app.get('/ws/data/load', db.initDB);
 app.get('/ws/data/within', db.selectBox);
 app.get('/ws/data/all', db.selectAll);
 app.get('/ws/info', db.wsinfo);
+app.get('/ws/info/:who', db.wsinfo);
 app.get('/ws/healthz', function (req, res, next) { res.send("OK"); });
 app.get('/', function (req, res, next)
 {
