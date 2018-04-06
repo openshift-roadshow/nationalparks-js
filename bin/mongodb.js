@@ -37,7 +37,7 @@ function init_db(persist_db_connection){
             if(errr){
               console.log(errr);
             }else{
-              console.log("points imported");
+              console.log("Items inserted in database: " + count );
             }
             return persist_db_connection || db.close();
           });
