@@ -2,23 +2,23 @@ var restify = require('restify'),
     fs      = require('fs'),
     config  = require('./bin/config.js'),
     db      = require('./bin/db.js');
-var app     = restify.createServer();
+var server  = restify.createServer();
 
+server.use(restify.plugins.queryParser())
 //db.initDB('keepAlive');
-app.use(restify.plugins.queryParser())
 
 // Routes
-app.get('/ws/data/load', db.initDB);
-app.get('/ws/data/within', db.selectBox);
-app.get('/ws/data/all', db.selectAll);
-app.get('/ws/info', db.wsinfo);
-app.get('/ws/info/:who', db.wsinfo);
-app.get('/ws/healthz', function (req, res, next) { res.send("OK"); });
-app.get('/', function (req, res, next)
+server.get('/ws/data/load', db.initDB);
+server.get('/ws/data/within', db.selectBox);
+server.get('/ws/data/all', db.selectAll);
+server.get('/ws/info', db.wsinfo);
+server.get('/ws/info/:who', db.wsinfo);
+server.get('/ws/healthz', function (req, res, next) { res.send("OK"); });
+server.get('/', function (req, res, next)
 {
   res.send("Welcome to the National Parks data service.");
 });
 
-app.listen(config.get('PORT'), config.get('IP'), function () {
+server.listen(config.get('PORT'), config.get('IP'), function () {
   console.log( "Listening on " + config.get('IP') + ", port " + config.get('PORT') )
 });
