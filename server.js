@@ -11,6 +11,8 @@ server.use(restify.plugins.queryParser())
 server.get('/ws/data/load', db.initDB);
 server.get('/ws/data/within', db.selectBox);
 server.get('/ws/data/all', db.selectAll);
+server.get('/ws/backends/info', db.wsinfo);
+server.get('/ws/backends/info/:who', db.wsinfo);
 server.get('/ws/info', db.wsinfo);
 server.get('/ws/info/:who', db.wsinfo);
 server.get('/ws/healthz', function (req, res, next) { res.send("OK"); });

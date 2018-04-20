@@ -1,0 +1,741 @@
+{
+    "apiVersion": "v1",
+    "kind": "Template",
+    "labels": {
+        "app": "workshop",
+        "template": "nationalparks-example"
+    },
+    "message": "The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.",
+    "metadata": {
+        "annotations": {
+            "description": "An example Node.js application with a MongoDB database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.\n\nWARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.",
+            "iconClass": "icon-nodejs",
+            "openshift.io/display-name": "NationalParks (Node.js + MongoDB)",
+            "openshift.io/documentation-url": "https://github.com/openshift-roadshow/nationalparks-js",
+            "openshift.io/long-description": "This template defines resources needed to develop a NodeJS application, including a build configuration, application deployment configuration, and database deployment configuration.  The database is stored in non-persistent storage, so this configuration should be used for experimental purposes only.",
+            "openshift.io/provider-display-name": "Red Hat, Inc.",
+            "openshift.io/support-url": "https://access.redhat.com",
+            "tags": "quickstart,nodejs,mongodb",
+            "template.openshift.io/bindable": "false"
+        },
+        "name": "nationalparks-example"
+    },
+    "objects": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "parksmap",
+                "creationTimestamp": null,
+                "labels": {
+                    "component": "parksmap",
+		    "role": "frontend"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                },
+                "tags": [
+                    {
+                        "name": "${PARKSMAP_IMAGE_TAG}",
+                        "annotations": {
+                            "openshift.io/imported-from": "${PARKSMAP_IMAGE_URL}:${PARKSMAP_IMAGE_TAG}"
+                        },
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "${PARKSMAP_IMAGE_URL}:${PARKSMAP_IMAGE_TAG}"
+                        },
+                        "generation": null,
+                        "importPolicy": {},
+                        "referencePolicy": {
+                            "type": ""
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "dockerImageRepository": ""
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "parksmap",
+                "creationTimestamp": null,
+                "labels": {
+                    "component": "parksmap",
+		    "role": "frontend"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "parksmap"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "parksmap:${PARKSMAP_IMAGE_TAG}"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "component": "parksmap",
+                    "deploymentconfig": "parksmap"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "component": "parksmap",
+		            "role": "frontend",
+                            "deploymentconfig": "parksmap"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "parksmap",
+                                "image": "${PARKSMAP_IMAGE_URL}:${PARKSMAP_IMAGE_TAG}",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {}
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {
+                "latestVersion": 0,
+                "observedGeneration": 0,
+                "replicas": 0,
+                "updatedReplicas": 0,
+                "availableReplicas": 0,
+                "unavailableReplicas": 0
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "parksmap",
+                "creationTimestamp": null,
+                "labels": {
+                    "component": "parksmap",
+		    "role": "frontend"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "parksmap"
+                }
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+                "name": "${NAME}"
+            },
+            "stringData": {
+                "database-admin-password": "${DATABASE_ADMIN_PASSWORD}",
+                "database-password": "${DATABASE_PASSWORD}",
+                "database-user": "${DATABASE_USER}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "description": "Exposes and load balances the application pods",
+                    "service.alpha.openshift.io/dependencies": "[{\"name\": \"${DATABASE_SERVICE_NAME}\", \"kind\": \"Service\"}]"
+                },
+		"labels": {
+		    "component": "${NAME}",
+		    "role": "parksmap-backend"
+		},
+                "name": "${NAME}"
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "web",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "${NAME}"
+                }
+            }
+        },
+	{
+            "kind": "RoleBinding",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "view",
+                "creationTimestamp": null
+            },
+            "groupNames": null,
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "default"
+                }
+            ],
+            "roleRef": {
+                "name": "view"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Route",
+            "metadata": {
+                "name": "${NAME}",
+                "labels": {
+                    "component": "${NAME}",
+		    "role": "parksmap-backend"
+                }
+            },
+            "spec": {
+                "host": "${WWW_APPLICATION_DOMAIN}",
+                "to": {
+                    "kind": "Service",
+                    "name": "${NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Route",
+            "metadata": {
+                "name": "parksmap",
+                "labels": {
+                    "component": "parksmap",
+		    "role": "frontend"
+                }
+            },
+            "spec": {
+                "host": "${WS_APPLICATION_DOMAIN}",
+                "to": {
+                    "kind": "Service",
+                    "name": "parksmap"
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                },
+                "name": "${NAME}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to build the application",
+                    "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+                "name": "${NAME}"
+            },
+            "spec": {
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${NAME}:latest"
+                    }
+                },
+                "postCommit": {
+                    "script": "npm test"
+                },
+                "source": {
+                    "contextDir": "${CONTEXT_DIR}",
+                    "git": {
+                        "ref": "${SOURCE_REPOSITORY_REF}",
+                        "uri": "${SOURCE_REPOSITORY_URL}"
+                    },
+                    "type": "Git"
+                },
+                "strategy": {
+                    "sourceStrategy": {
+                        "env": [
+                            {
+                                "name": "NPM_MIRROR",
+                                "value": "${NPM_MIRROR}"
+                            }
+                        ],
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "nodejs:6",
+                            "namespace": "${NAMESPACE}"
+                        }
+                    },
+                    "type": "Source"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        },
+                        "type": "GitHub"
+                    },
+                    {
+                        "generic": {
+                            "secret": "${GENERIC_WEBHOOK_SECRET}"
+                        },
+                        "type": "Generic"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to deploy the application server",
+                    "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+		"labels": {
+                    "component": "${NAME}",
+		    "role": "parksmap-backend"
+                },
+                "name": "${NAME}"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "component": "${NAME}",
+		    "deploymentconfig": "${NAME}"
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+		            "deploymentconfig": "${NAME}",
+		            "component": "${NAME}",
+                            "role": "parksmap-backend"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "DB_HOST",
+                                        "value": "${DATABASE_SERVICE_NAME}"
+                                    },
+                                    {
+                                        "name": "DB_USERNAME",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-user",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "DB_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "DB_NAME",
+                                        "value": "${DATABASE_NAME}"
+                                    },
+                                    {
+                                        "name": "MONGODB_ADMIN_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-admin-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "${NAME}:latest",
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/",
+                                        "port": 8080
+                                    },
+                                    "initialDelaySeconds": 30,
+                                    "timeoutSeconds": 3
+                                },
+                                "name": "${NAME}",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/",
+                                        "port": 8080
+                                    },
+                                    "initialDelaySeconds": 3,
+                                    "timeoutSeconds": 3
+                                },
+                                "resources": {
+                                    "limits": {
+                                        "memory": "${MEMORY_LIMIT}"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "triggers": [
+                    {
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "${NAME}"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "${NAME}:latest"
+                            }
+                        },
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "description": "Exposes the database server"
+                },
+                "name": "${DATABASE_SERVICE_NAME}"
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "mongodb",
+                        "port": 27017,
+                        "targetPort": 27017
+                    }
+                ],
+                "selector": {
+                    "name": "${DATABASE_SERVICE_NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to deploy the database",
+                    "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+                "name": "${DATABASE_SERVICE_NAME}"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "name": "${DATABASE_SERVICE_NAME}"
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "${DATABASE_SERVICE_NAME}"
+                        },
+                        "name": "${DATABASE_SERVICE_NAME}"
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "MONGODB_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-user",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MONGODB_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MONGODB_DATABASE",
+                                        "value": "${DATABASE_NAME}"
+                                    },
+                                    {
+                                        "name": "MONGODB_ADMIN_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-admin-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": " ",
+                                "livenessProbe": {
+                                    "initialDelaySeconds": 30,
+                                    "tcpSocket": {
+                                        "port": 27017
+                                    },
+                                    "timeoutSeconds": 1
+                                },
+                                "name": "mongodb",
+                                "ports": [
+                                    {
+                                        "containerPort": 27017
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-i",
+                                            "-c",
+                                            "mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD --eval=\"quit()\""
+                                        ]
+                                    },
+                                    "initialDelaySeconds": 3,
+                                    "timeoutSeconds": 1
+                                },
+                                "resources": {
+                                    "limits": {
+                                        "memory": "${MEMORY_MONGODB_LIMIT}"
+                                    }
+                                },
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/lib/mongodb/data",
+                                        "name": "${DATABASE_SERVICE_NAME}-data"
+                                    }
+                                ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "emptyDir": {
+                                    "medium": ""
+                                },
+                                "name": "${DATABASE_SERVICE_NAME}-data"
+                            }
+                        ]
+                    }
+                },
+                "triggers": [
+                    {
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "mongodb"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "mongodb:3.2",
+                                "namespace": "${NAMESPACE}"
+                            }
+                        },
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "description": "The name assigned to all of the frontend objects defined in this template.",
+            "displayName": "Name",
+            "name": "NAME",
+            "required": true,
+            "value": "nationalparks"
+        },
+        {
+            "description": "The OpenShift Namespace where the ImageStream resides.",
+            "displayName": "Namespace",
+            "name": "NAMESPACE",
+            "required": true,
+            "value": "openshift"
+        },
+        {
+            "description": "Maximum amount of memory the Node.js container can use.",
+            "displayName": "Memory Limit",
+            "name": "MEMORY_LIMIT",
+            "required": true,
+            "value": "512Mi"
+        },
+        {
+            "description": "Maximum amount of memory the MongoDB container can use.",
+            "displayName": "Memory Limit (MongoDB)",
+            "name": "MEMORY_MONGODB_LIMIT",
+            "required": true,
+            "value": "512Mi"
+        },
+        {
+            "description": "The image registry URL containing your parksmap front-end.",
+            "displayName": "Parksmap image URL",
+            "name": "PARKSMAP_IMAGE_URL",
+            "required": true,
+            "value": "docker.io/openshiftroadshow/parksmap"
+        },
+        {
+            "description": "The image release tag for the parksmap front-end.",
+            "displayName": "Parksmap image tag",
+            "name": "PARKSMAP_IMAGE_TAG",
+            "required": true,
+            "value": "1.2.0"
+        },
+        {
+            "description": "The URL of the repository with your application source code.",
+            "displayName": "Git Repository URL",
+            "name": "SOURCE_REPOSITORY_URL",
+            "required": true,
+            "value": "https://github.com/openshift-roadshow/nationalparks-js.git"
+        },
+        {
+            "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch.",
+            "displayName": "Git Reference",
+            "name": "SOURCE_REPOSITORY_REF"
+        },
+        {
+            "description": "Set this to the relative path to your project if it is not in the root of your repository.",
+            "displayName": "Context Directory",
+            "name": "CONTEXT_DIR"
+        },
+        {
+            "description": "The exposed hostname that will route to the Parksmap service, if left blank a value will be defaulted.",
+            "displayName": "Application Front-End Hostname",
+            "name": "WWW_APPLICATION_DOMAIN",
+            "value": ""
+        },
+        {
+            "description": "The exposed hostname that will route to the NationalParks web service, if left blank a value will be defaulted.",
+            "displayName": "WebServices Hostname",
+            "name": "WS_APPLICATION_DOMAIN",
+            "value": ""
+        },
+        {
+            "description": "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.",
+            "displayName": "GitHub Webhook Secret",
+            "from": "[a-zA-Z0-9]{40}",
+            "generate": "expression",
+            "name": "GITHUB_WEBHOOK_SECRET"
+        },
+        {
+            "description": "A secret string used to configure the Generic webhook.",
+            "displayName": "Generic Webhook Secret",
+            "from": "[a-zA-Z0-9]{40}",
+            "generate": "expression",
+            "name": "GENERIC_WEBHOOK_SECRET"
+        },
+        {
+            "displayName": "Database Service Name",
+            "name": "DATABASE_SERVICE_NAME",
+            "required": true,
+            "value": "mongodb"
+        },
+        {
+            "description": "Username for MongoDB user that will be used for accessing the database.",
+            "displayName": "MongoDB Username",
+            "from": "user[A-Z0-9]{3}",
+            "generate": "expression",
+            "name": "DATABASE_USER"
+        },
+        {
+            "description": "Password for the MongoDB user.",
+            "displayName": "MongoDB Password",
+            "from": "[a-zA-Z0-9]{16}",
+            "generate": "expression",
+            "name": "DATABASE_PASSWORD"
+        },
+        {
+            "displayName": "Database Name",
+            "name": "DATABASE_NAME",
+            "required": true,
+            "value": "mongodb"
+        },
+        {
+            "description": "Password for the database admin user.",
+            "displayName": "Database Administrator Password",
+            "from": "[a-zA-Z0-9]{16}",
+            "generate": "expression",
+            "name": "DATABASE_ADMIN_PASSWORD"
+        },
+        {
+            "description": "The custom NPM mirror URL",
+            "displayName": "Custom NPM Mirror URL",
+            "name": "NPM_MIRROR",
+            "value": ""
+        }
+    ]
+}
