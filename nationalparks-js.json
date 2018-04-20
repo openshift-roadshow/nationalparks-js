@@ -230,7 +230,7 @@
                 "name": "${NAME}",
                 "labels": {
                     "component": "${NAME}",
-		    "role": "parksmap-backend"
+		    "type": "parksmap-backend"
                 }
             },
             "spec": {
