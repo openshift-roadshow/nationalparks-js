@@ -375,6 +375,10 @@
                                         "value": "${DATABASE_SERVICE_NAME}"
                                     },
                                     {
+                                        "name": "DB_AUTOLOAD",
+                                        "value": "${DB_AUTOLOAD}"
+                                    },
+                                    {
                                         "name": "DB_USERNAME",
                                         "valueFrom": {
                                             "secretKeyRef": {
