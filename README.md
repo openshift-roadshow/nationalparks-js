@@ -7,18 +7,23 @@
 To launch this demo, login to your OpenShift cluster and select a project, then run:
 
 ```bash
+oc process -f https://raw.githubusercontent.com/ryanj/nationalparks-js/master/nationalparks-js.json | oc create -f -
+```
+
+When the builds and deployments have completed, you should be able to view the resulting map solution at the following url:
+```bash
+oc get routes/parksmap --template={{.spec.host}}
+```
+
+## Installation
+Use `oc create` to install the template, making it easily launchable by anyone who has access to the selected project scope:
+```bash
 oc create -f nationalparks-js.json
+```
+
+Installing the template will allow you to launch the app from the Web-based Service Catalog, or from the command-line:
+```bash
 oc new-app nationalparks-example
-```
-
-Next, populate the database:
-```bash
-curl $(oc get routes/nationalparks --template={{.spec.host}}/ws/data/load)
-```
-
-Then, view the resulting map solution in your browser of choice:
-```bash
-firefox $(oc get routes/parksmap --template={{.spec.host}})
 ```
 
 ### Local Dev
