@@ -11,6 +11,10 @@ if( db_svc == "postgresql"){
   console.log("ERROR: DB Configuration missing! Failed to autoconfigure database");
 }
 
+if(config.get("db_autoload") == "true"){
+  db.initDB('keepAlive');
+}
+
 db_export.wsinfo = function (req, res, next)
 {
   res.status(200);

@@ -5,7 +5,6 @@ var restify = require('restify'),
 var server  = restify.createServer();
 
 server.use(restify.plugins.queryParser())
-//db.initDB('keepAlive');
 
 // Routes
 server.get('/ws/data/load', db.initDB);

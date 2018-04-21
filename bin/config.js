@@ -6,6 +6,7 @@ var autoconfig  = function (config_overrides){
     password: process.env.MONGODB_PASSWORD || process.env.DB_PASSWORD || 'mongodb',
     table_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
     collection_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
+    db_autoload: process.env.DB_AUTOLOAD || "false",
     db_host: process.env.DB_HOST || "mongodb",
     db_port: process.env.DB_PORT || "27017",
     db_svc_name: process.env.DATABASE_SERVICE_NAME || process.env.DB_HOST || "mongodb"
