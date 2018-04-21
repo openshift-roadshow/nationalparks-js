@@ -4,4 +4,8 @@ var db = require('./db.js')
 //db.flushDB();
 
 // Initialize the DB
-db.initDB();
+if(config.get("db_autoload") == "true"){
+  console.log("pre-populating database values...")
+  db.initDB();
+  //db.initDB('keepAlive');
+}

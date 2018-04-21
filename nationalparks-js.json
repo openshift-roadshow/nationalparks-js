@@ -719,6 +719,12 @@
             "name": "DATABASE_PASSWORD"
         },
         {
+            "displayName": "Automatically populate the Database",
+            "name": "DB_AUTOLOAD",
+            "required": true,
+            "value": "true"
+        },
+        {
             "displayName": "Database Name",
             "name": "DATABASE_NAME",
             "required": true,
