@@ -1,3 +1,4 @@
+var config = require('./config.js')
 var db = require('./db.js')
 
 // Flush the DB

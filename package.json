@@ -18,8 +18,8 @@
     "url": "https://github.com/openshift-roadshow/nationalparks-js.git"
   },
   "scripts": {
+    "prestart": "npm run initdb",
     "start": "node server.js",
-    "poststart": "npm run initdb",
     "flushdb": "node bin/flushdb.js",
     "initdb": "node bin/bootstrap.js"
   },
