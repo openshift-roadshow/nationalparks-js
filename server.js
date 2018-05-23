@@ -15,6 +15,7 @@ server.get('/ws/backends/info/:who', db.wsinfo);
 server.get('/ws/info', db.wsinfo);
 server.get('/ws/info/:who', db.wsinfo);
 server.get('/ws/healthz', function (req, res, next) { res.send("OK"); });
+server.get('/ws/healthz/:ok', function (req, res, next) { res.send("OK"); });
 server.get('/', function (req, res, next)
 {
   res.send("Welcome to the National Parks data service.");
