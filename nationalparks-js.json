@@ -706,7 +706,7 @@
             "displayName": "Database Service Name",
             "name": "DATABASE_SERVICE_NAME",
             "required": true,
-            "value": "mongodb"
+            "value": "mongodb-nationalparks"
         },
         {
             "description": "Username for MongoDB user that will be used for accessing the database.",
