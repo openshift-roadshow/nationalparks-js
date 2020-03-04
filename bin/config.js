@@ -2,13 +2,13 @@ var multipaas   = require('config-multipaas');
 var autoconfig  = function (config_overrides){
   var config    = multipaas(config_overrides).add({
     uri: process.env.uri || process.env.DB_USERNAME || 'mongodb',
-    username: process.env.MONGODB_USER || process.env.DB_USERNAME || 'mongodb',
-    password: process.env.MONGODB_PASSWORD || process.env.DB_PASSWORD || 'mongodb',
-    table_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
+    username: process.env.username || process.env.MONGODB_USER || process.env.DB_USERNAME || 'mongodb',
+    password: process.env.password || process.env.MONGODB_PASSWORD || process.env.DB_PASSWORD || 'mongodb',
+    table_name: process.env.database_name || process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
     collection_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
     db_autoload: process.env.DB_AUTOLOAD || "false",
-    db_host: process.env.DB_HOST || "mongodb-nationalparks",
-    db_port: process.env.DB_PORT || "27017",
+    db_host: process.env.MONGODB_SERVICE_HOST || process.env.DB_HOST || "mongodb-nationalparks",
+    db_port: process.env.MONGODB_SERVICE_PORT || process.env.DB_PORT || "27017",
     db_proto: process.env.DB_PROTO || "mongodb",
     db_svc_name: process.env.DATABASE_SERVICE_NAME || "mongodb"
   })
