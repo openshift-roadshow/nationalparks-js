@@ -5,6 +5,7 @@ var restify = require('restify'),
 var server  = restify.createServer();
 
 server.use(restify.plugins.queryParser())
+server.server.setTimeout(60000*5); // Set the timout to 5 minutes
 
 // Routes
 server.get('/ws/data/load', db.initDB);
