@@ -7,7 +7,7 @@ var autoconfig  = function (config_overrides){
     table_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
     collection_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
     db_autoload: process.env.DB_AUTOLOAD || "false",
-    db_host: process.env.DB_HOST || "mongodb-nationalparks",
+    db_host: process.env.DB_HOST || "mongodb",
     db_port: process.env.DB_PORT || "27017",
     db_proto: process.env.DB_PROTO || "mongodb",
     db_svc_name: process.env.DATABASE_SERVICE_NAME || "mongodb"
