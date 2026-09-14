@@ -1,12 +1,13 @@
 var config = require('./config.js')
 var db = require('./db.js')
 
-// Flush the DB
-//db.flushDB();
-
 // Initialize the DB
-if(config.get("db_autoload") == "true"){
+if(config.dbAutoload){
   console.log("pre-populating database values...")
-  db.initDB();
-  //db.initDB('keepAlive');
+  db.loadData().then(function (inserted){
+    console.log("Items inserted in database: " + inserted);
+  }).catch(function (err){
+    console.error(err);
+    process.exitCode = 1;
+  }).then(db.close);
 }
