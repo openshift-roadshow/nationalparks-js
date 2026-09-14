@@ -1,33 +1,35 @@
-var multipaas   = require('config-multipaas');
-var autoconfig  = function (config_overrides){
-  var config    = multipaas(config_overrides).add({
-    uri: process.env.uri || process.env.DB_USERNAME || 'mongodb',
-    username: process.env.MONGODB_USER || process.env.DB_USERNAME || 'mongodb',
-    password: process.env.MONGODB_PASSWORD || process.env.DB_PASSWORD || 'mongodb',
-    table_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
-    collection_name: process.env.MONGODB_DATABASE || process.env.DB_NAME || 'mongodb',
-    db_autoload: process.env.DB_AUTOLOAD || "false",
-    db_host: process.env.DB_HOST || "mongodb-nationalparks",
-    db_port: process.env.DB_PORT || "27017",
-    db_proto: process.env.DB_PROTO || "mongodb",
-    db_svc_name: process.env.DATABASE_SERVICE_NAME || "mongodb"
-  })
+// MONGODB_SERVER_HOST, MONGODB_DATABASE, MONGODB_USER and MONGODB_PASSWORD are the
+// variables the OpenShift workshop documents, and are shared with the Java, Python and
+// .NET National Parks backends. The older DB_* names are still honoured so existing
+// deployments keep working.
+var env = process.env;
 
-  var ws_info = {
-    id: "nationalparks-js",
-    displayName: "National Parks (JS)",
-    type: "cluster",
-    center: {'latitude': '47.039304', 'longitude': '14.505178'},
+var host = env.MONGODB_SERVER_HOST || env.DB_HOST || 'mongodb-nationalparks';
+var port = env.MONGODB_SERVER_PORT || env.DB_PORT || '27017';
+var proto = env.DB_PROTO || 'mongodb';
+var database = env.MONGODB_DATABASE || env.DB_NAME || 'mongodb';
+var username = env.MONGODB_USER || env.DB_USERNAME || 'mongodb';
+var password = env.MONGODB_PASSWORD || env.DB_PASSWORD || 'mongodb';
+
+var credentials = username
+  ? encodeURIComponent(username) + ':' + encodeURIComponent(password) + '@'
+  : '';
+
+module.exports = {
+  ip: env.OPENSHIFT_NODEJS_IP || env.IP || '0.0.0.0',
+  port: Number(env.OPENSHIFT_NODEJS_PORT || env.PORT || 8080),
+
+  dbServiceName: env.DATABASE_SERVICE_NAME || 'mongodb',
+  dbUrl: proto + '://' + credentials + host + ':' + port + '/' + database,
+  dbName: database,
+  collectionName: env.MONGODB_COLLECTION || database,
+  dbAutoload: (env.DB_AUTOLOAD || 'false') === 'true',
+
+  wsinfo: {
+    id: 'nationalparks-js',
+    displayName: 'National Parks (JS)',
+    type: 'cluster',
+    center: { latitude: '47.039304', longitude: '14.505178' },
     zoom: 4
-  };
-
-  var creds = config.get('username')+':'+config.get('password')+'@';
-  var db_config = config.get('db_proto')+'://'+creds+config.get('db_host')+":"+config.get('db_port')+"/";
-      table     = config.get('table_name');
-
-  config.add({db_config: db_config+table});
-  config.add({wsinfo: JSON.stringify(ws_info)});
-  return config;
-}
-
-exports = module.exports = autoconfig();
+  }
+};
